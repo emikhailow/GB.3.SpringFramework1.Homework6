@@ -16,5 +16,6 @@
 
         <mapping class="com.geekbrains.homework6.data.Product"/>
         <mapping class="com.geekbrains.homework6.data.Customer"/>
+        <mapping class="com.geekbrains.homework6.data.Order"/>
     </session-factory>
 </hibernate-configuration>

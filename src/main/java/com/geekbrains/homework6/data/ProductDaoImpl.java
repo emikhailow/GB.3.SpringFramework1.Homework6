@@ -57,15 +57,31 @@ public class ProductDaoImpl implements ProductDao{
     }
 
     @Override
-    public List<Customer> getCustomers(Long productId) {
+    public List<Customer> getAllCustomers(Long productId) {
+
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
-            Product product = session.get(Product.class, productId);
-            product.getCustomers().size();
-            List<Customer> customers = product.getCustomers();
+            List<Customer> customers = session
+                    .createQuery("select distinct c from Customer c inner join c.orders co where co.product.id = :id", Customer.class)
+                    .setParameter("id", productId)
+                    .getResultList();
             session.getTransaction().commit();
             return customers;
-
         }
     }
+
+    @Override
+    public List<Order> getOrders(Long productId) {
+        try(Session session = sessionFactoryUtils.getSession()){
+            session.beginTransaction();
+            List<Order> orders = session
+                    .createNamedQuery("productWithOrders", Product.class)
+                    .setParameter("id", productId)
+                    .getSingleResult()
+                    .getOrders();
+            session.getTransaction().commit();
+            return  orders;
+        }
+    }
+
 }

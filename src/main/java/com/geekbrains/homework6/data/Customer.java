@@ -5,6 +5,9 @@ import java.util.List;
 
 @Entity
 @Table(name="customers")
+@NamedQueries({
+        @NamedQuery(name = "customerWithOrders", query = "SELECT c FROM Customer c JOIN FETCH c.orders WHERE c.id = :id")
+})
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,21 +16,8 @@ public class Customer {
     @Column(name = "name")
     private String name;
 
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
-    @ManyToMany
-    @JoinTable(
-            name = "customers_products",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders;
 
     public Customer(String name) {
         this.name = name;
@@ -59,4 +49,14 @@ public class Customer {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
+
 }

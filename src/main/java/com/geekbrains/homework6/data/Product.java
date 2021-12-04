@@ -6,6 +6,9 @@ import java.util.Random;
 
 @Entity
 @Table(name = "products")
+@NamedQueries({
+        @NamedQuery(name = "productWithOrders", query = "SELECT p FROM Product p JOIN FETCH p.orders WHERE p.id = :id")
+})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,24 +18,11 @@ public class Product {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "cost")
-    private double cost;
+    @Column(name = "price")
+    private double price;
 
-    public List<Customer> getCustomers() {
-        return customers;
-    }
-
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
-    }
-
-    @ManyToMany
-    @JoinTable(
-            name = "customers_products",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id")
-    )
-    private List<Customer> customers;
+    @OneToMany(mappedBy = "product")
+    private List<Order> orders;
 
     @Transient
     private final Random random = new Random();
@@ -60,10 +50,6 @@ public class Product {
         return title;
     }
 
-    public double getCost() {
-        return cost;
-    }
-
     public Product(Long id) {
         this.id = id;
         this.title = String.format("Item %011d", id);
@@ -71,7 +57,7 @@ public class Product {
     }
 
     private void generateRandomPrice() {
-        this.cost = Math.floor(100 * (MIN_PRICE + (MAX_PRICE - MIN_PRICE) * random.nextDouble())) / 100;
+        this.price = Math.floor(100 * (MIN_PRICE + (MAX_PRICE - MIN_PRICE) * random.nextDouble())) / 100;
     }
 
     public Product() {
@@ -81,12 +67,28 @@ public class Product {
         this.id = id;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", cost=" + cost +
+                ", price=" + price +
                 '}';
     }
 }

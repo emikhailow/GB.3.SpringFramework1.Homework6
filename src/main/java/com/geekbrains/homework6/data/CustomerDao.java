@@ -9,8 +9,9 @@ import java.util.List;
 public interface CustomerDao {
     Customer getByID(Long id);
     List<Customer> getCustomerList();
+    List<Order> getOrders(Long customerId);
     void remove(Long id);
     void add(String title);
-    List<Product> getProducts(Long customerId);
+    List<Product> getAllProducts(Long customerId);
 
 }

@@ -10,5 +10,6 @@ public interface ProductDao {
     List<Product> getProductsList();
     void removeItem(Long id);
     void addItem(String title);
-    List<Customer> getCustomers(Long productId);
+    List<Customer> getAllCustomers(Long productId);
+    List<Order> getOrders(Long id);
 }

@@ -56,15 +56,36 @@ public class CustomerDaoImpl implements CustomerDao{
     }
 
     @Override
-    public List<Product> getProducts(Long customer_id) {
+    public List<Product> getAllProducts(Long customerId) {
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
-            Customer customer = session.get(Customer.class, customer_id);
-            customer.getProducts().size();
-            List<Product> products = customer.getProducts();
+            List<Product> products = session
+                    .createQuery("select distinct p from Product p inner join p.orders po where po.customer.id = :id", Product.class)
+                    .setParameter("id", customerId)
+                    .getResultList();
             session.getTransaction().commit();
             return products;
-
         }
     }
+
+   @Override
+    public List<Order> getOrders(Long customerId) {
+        try(Session session = sessionFactoryUtils.getSession()){
+            session.beginTransaction();
+            List<Order> orders = session
+                    .createNamedQuery("customerWithOrders", Customer.class)
+                    .setParameter("id", customerId)
+                    .getSingleResult()
+                    .getOrders();
+            session.getTransaction().commit();
+            return  orders;
+        }
+    }
+
+
+
+
+
+
+
 }
