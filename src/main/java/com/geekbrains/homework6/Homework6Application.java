@@ -35,11 +35,11 @@ public class Homework6Application {
             Customer customer = customerDao.getByID((long) i + 1);
 
             for (int j = 0; j < ITEMS_COUNT; j++) {
-                //if(random.nextBoolean()){
-                //    Product product = productDao.getByID((long) j + 1);
-                //    orderDao.createOrder(customer, product);
-                //    orderDao.createOrder(customer, product);
-                //}
+                if(random.nextBoolean()){
+                    Product product = productDao.getByID((long) j + 1);
+                    orderDao.createOrder(customer, product);
+                    orderDao.createOrder(customer, product);
+                }
             }
 
         }

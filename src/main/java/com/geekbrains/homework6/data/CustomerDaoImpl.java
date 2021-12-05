@@ -4,7 +4,7 @@ import com.geekbrains.homework6.hibernate.SessionFactoryUtils;
 import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 @Component
 public class CustomerDaoImpl implements CustomerDao{
@@ -60,7 +60,7 @@ public class CustomerDaoImpl implements CustomerDao{
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
             List<Product> products = session
-                    .createQuery("select distinct p from Product p inner join p.orders po where po.customer.id = :id", Product.class)
+                    .createQuery("select distinct o.product from Order o where o.customer.id = :id", Product.class)
                     .setParameter("id", customerId)
                     .getResultList();
             session.getTransaction().commit();
@@ -72,13 +72,15 @@ public class CustomerDaoImpl implements CustomerDao{
     public List<Order> getOrders(Long customerId) {
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
-            List<Order> orders = session
+            Optional<Customer> customer = session
                     .createNamedQuery("customerWithOrders", Customer.class)
                     .setParameter("id", customerId)
-                    .getSingleResult()
-                    .getOrders();
+                    .getResultList()
+                    .stream()
+                    .findFirst();
+            List<Order> orders = customer.isEmpty() ? Collections.emptyList() : customer.get().getOrders();
             session.getTransaction().commit();
-            return  orders;
+            return orders;
         }
     }
 

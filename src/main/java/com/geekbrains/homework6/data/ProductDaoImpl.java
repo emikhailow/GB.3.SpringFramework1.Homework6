@@ -4,7 +4,9 @@ import com.geekbrains.homework6.hibernate.SessionFactoryUtils;
 import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ProductDaoImpl implements ProductDao{
@@ -62,7 +64,7 @@ public class ProductDaoImpl implements ProductDao{
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
             List<Customer> customers = session
-                    .createQuery("select distinct c from Customer c inner join c.orders co where co.product.id = :id", Customer.class)
+                    .createQuery("select distinct o.customer from Order o where o.product.id = :id", Customer.class)
                     .setParameter("id", productId)
                     .getResultList();
             session.getTransaction().commit();
@@ -74,13 +76,15 @@ public class ProductDaoImpl implements ProductDao{
     public List<Order> getOrders(Long productId) {
         try(Session session = sessionFactoryUtils.getSession()){
             session.beginTransaction();
-            List<Order> orders = session
+
+            Optional<Product> product = session
                     .createNamedQuery("productWithOrders", Product.class)
                     .setParameter("id", productId)
-                    .getSingleResult()
-                    .getOrders();
-            session.getTransaction().commit();
-            return  orders;
+                    .getResultList()
+                    .stream()
+                    .findFirst();
+            List<Order> orders = product.isEmpty() ? Collections.emptyList() : product.get().getOrders();
+            return orders;
         }
     }
 
